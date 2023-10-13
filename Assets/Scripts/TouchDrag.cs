@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TouchInput : MonoBehaviour
+public class TouchDrag : MonoBehaviour
 {
     public float ForceMultiplier;
     Camera cam;
@@ -25,11 +25,11 @@ public class TouchInput : MonoBehaviour
         var worldPoint = cam.ScreenToWorldPoint(touch.position);
         var distance = (worldPoint - (Vector3)(rb.position));
         var finalMultiplier = ForceMultiplier;
-        if (Vector2.Dot(rb.velocity, distance.normalized) < 0)
-        {
-            finalMultiplier = 1.2f * finalMultiplier;
-        }
-        var theForce = Time.deltaTime * ((distance).normalized * finalMultiplier);
+        //if (Vector2.Dot(rb.velocity, distance.normalized) < 0)
+        //{
+        //    finalMultiplier = 1.2f * finalMultiplier;
+        //}
+        var theForce = ((distance) * finalMultiplier);
         print($"Adding force: {theForce}");
         rb.velocity = theForce;
     }
@@ -54,7 +54,6 @@ public class TouchInput : MonoBehaviour
                     print($"Processing object: {obj}");
                     if (obj.CompareTag("draggable"))
                     {
-                        print("DOING SOMETHING!!!!");
                         currentTouches[touch.fingerId] = obj;
                         obj.GetComponent<Rigidbody2D>().gravityScale = 0.0f;
                         DoMove(touch);
