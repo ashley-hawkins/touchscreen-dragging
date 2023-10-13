@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class TouchDrag : MonoBehaviour
 {
-    public float ForceMultiplier;
+    public float ForceMultiplier = 10;
+    public bool DragFromOffsetPoint = true;
     Camera cam;
-    Dictionary<int, (float, GameObject)> currentTouches;
+    Dictionary<int, (float, Vector3, GameObject)> currentTouches;
     void Start()
     {
         currentTouches = new();
@@ -17,21 +18,19 @@ public class TouchDrag : MonoBehaviour
         var fingerId = touch.fingerId;
         if (!currentTouches.ContainsKey(fingerId)) return;
 
-        var (_, obj) = currentTouches[fingerId];
+        var (_, offset, obj) = currentTouches[fingerId];
+        offset = obj.transform.rotation * offset;
         var rb = obj.GetComponent<Rigidbody2D>();
         if (rb == null) return;
-        print("DOING MOVE");
 
-        var worldPoint = cam.ScreenToWorldPoint(touch.position);
+        var worldPoint = cam.ScreenToWorldPoint(touch.position) - offset;
         var distance = (worldPoint - (Vector3)(rb.position));
-        var finalMultiplier = ForceMultiplier;
-        //if (Vector2.Dot(rb.velocity, distance.normalized) < 0)
-        //{
-        //    finalMultiplier = 1.2f * finalMultiplier;
-        //}
-        var theForce = ((distance) * finalMultiplier);
+        var theForce = ((distance) * ForceMultiplier);
         print($"Adding force: {theForce}");
-        rb.velocity = theForce;
+        if (theForce.magnitude > 0.1f)
+        {
+            rb.AddForceAtPosition(((Vector2)theForce - rb.velocity) * rb.mass, obj.transform.position + offset, ForceMode2D.Impulse);
+        }
     }
 
     // Update is called once per frame
@@ -55,8 +54,8 @@ public class TouchDrag : MonoBehaviour
                     if (obj.CompareTag("draggable"))
                     {
                         var rb = obj.GetComponent<Rigidbody2D>();
-                        currentTouches[touch.fingerId] = (rb.gravityScale, obj);
-                        rb.gravityScale = 0.0f;
+                        currentTouches[touch.fingerId] = (rb.gravityScale, Quaternion.Inverse(obj.transform.rotation) * (worldPoint - obj.transform.position), obj);
+                        //rb.gravityScale = 0.0f;
                         DoMove(touch);
                         break;
                     }
@@ -70,8 +69,8 @@ public class TouchDrag : MonoBehaviour
             {
                 print($"Touch ended with ID {touch.fingerId}");
                 if (!currentTouches.ContainsKey(touch.fingerId)) return;
-                var (gravityScale, obj) = currentTouches[touch.fingerId];
-                obj.GetComponent<Rigidbody2D>().gravityScale = gravityScale;
+                var (gravityScale, _, obj) = currentTouches[touch.fingerId];
+                //obj.GetComponent<Rigidbody2D>().gravityScale = gravityScale;
                 currentTouches.Remove(touch.fingerId);
             }
         }
