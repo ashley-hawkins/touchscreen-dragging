@@ -6,7 +6,7 @@ public class TouchDrag : MonoBehaviour
 {
     public float ForceMultiplier;
     Camera cam;
-    Dictionary<int, GameObject> currentTouches;
+    Dictionary<int, (float, GameObject)> currentTouches;
     void Start()
     {
         currentTouches = new();
@@ -17,7 +17,7 @@ public class TouchDrag : MonoBehaviour
         var fingerId = touch.fingerId;
         if (!currentTouches.ContainsKey(fingerId)) return;
 
-        var obj = currentTouches[fingerId];
+        var (_, obj) = currentTouches[fingerId];
         var rb = obj.GetComponent<Rigidbody2D>();
         if (rb == null) return;
         print("DOING MOVE");
@@ -54,8 +54,9 @@ public class TouchDrag : MonoBehaviour
                     print($"Processing object: {obj}");
                     if (obj.CompareTag("draggable"))
                     {
-                        currentTouches[touch.fingerId] = obj;
-                        obj.GetComponent<Rigidbody2D>().gravityScale = 0.0f;
+                        var rb = obj.GetComponent<Rigidbody2D>();
+                        currentTouches[touch.fingerId] = (rb.gravityScale, obj);
+                        rb.gravityScale = 0.0f;
                         DoMove(touch);
                         break;
                     }
@@ -69,7 +70,8 @@ public class TouchDrag : MonoBehaviour
             {
                 print($"Touch ended with ID {touch.fingerId}");
                 if (!currentTouches.ContainsKey(touch.fingerId)) return;
-                currentTouches[touch.fingerId].GetComponent<Rigidbody2D>().gravityScale = 1.0f;
+                var (gravityScale, obj) = currentTouches[touch.fingerId];
+                obj.GetComponent<Rigidbody2D>().gravityScale = gravityScale;
                 currentTouches.Remove(touch.fingerId);
             }
         }
