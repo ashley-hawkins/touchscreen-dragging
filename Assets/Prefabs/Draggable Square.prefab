@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 6545508438630284342}
   - component: {fileID: 6198766214727355984}
   - component: {fileID: 5382826982670348659}
+  - component: {fileID: 8247005561258063534}
   m_Layer: 0
   m_Name: Draggable Square
-  m_TagString: draggable
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -159,3 +160,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &8247005561258063534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3407206164361604359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d61deb82f40df4a4e96bee182091ee57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
